@@ -62,6 +62,7 @@ def main():
             "dtend": datetime.strptime(booking['session']['end_date'], r"%Y-%m-%d %H:%M:%S"),
             "geo": Geo(location.latitude, location.longitude),
             "comment": [comment],
+            "location": address,
         }
 
         calendar.events.append(
