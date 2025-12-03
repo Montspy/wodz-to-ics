@@ -2,7 +2,8 @@ import os
 from dotenv import dotenv_values
 from wodz import WODZ
 
-from datetime import datetime
+from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 from ical.calendar import Calendar
 from ical.event import Event
 from ical.types import Geo
@@ -56,10 +57,13 @@ def main():
 
         comment = f"{booking['session']['maxBookingSlots'] - booking['session']['availableBookingSpots']}/{booking['session']['maxBookingSlots']}"
 
+        def utc_to_local(utc_dt: datetime) -> datetime:
+            return utc_dt.replace(tzinfo=ZoneInfo("UTC")).astimezone(tz=None)
+
         event_params = {
             "summary": booking['session']['training_category']['name'],
-            "dtstart": datetime.strptime(booking['session']['start_date'], r"%Y-%m-%d %H:%M:%S"),
-            "dtend": datetime.strptime(booking['session']['end_date'], r"%Y-%m-%d %H:%M:%S"),
+            "dtstart": utc_to_local(datetime.strptime(booking['session']['start_date'], r"%Y-%m-%d %H:%M:%S")),
+            "dtend": utc_to_local(datetime.strptime(booking['session']['end_date'], r"%Y-%m-%d %H:%M:%S")),
             "geo": Geo(location.latitude, location.longitude),
             "comment": [comment],
             "location": address,
