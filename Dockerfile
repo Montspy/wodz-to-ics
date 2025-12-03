@@ -2,9 +2,9 @@ FROM python:3.14-alpine
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apk add git
+RUN git clone https://github.com/Montspy/wodz-to-ics.git
+RUN pip install --no-cache-dir -r wodz-to-ics/requirements.txt
 
-COPY ./wodztoics ./wodztoics
 
-CMD ["python", "./wodztoics/__init__.py"]
+CMD ["python", "./wodz-to-ics/wodztoics/__init__.py"]
