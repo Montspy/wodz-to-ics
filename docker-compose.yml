@@ -6,7 +6,7 @@ services:
     image: lipanski/docker-static-website:latest
     restart: unless-stopped
     ports:
-      - "3000:3000" # File will be served at webcal://localhost:3000/wodz.ics
+      - "3000:3000" # File will be served at http://localhost:3000/wodz.ics
     volumes:
       - /path/to/folder:/home/static:ro
 
