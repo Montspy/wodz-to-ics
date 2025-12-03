@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  wodztoics:
+    container_name: wodztoics
+    image: ghcr.io/montspy/wodz-to-ics:main
+    command: "tail -f /dev/null" # Ofelia job-exec requires the container to be running
+    volumes:
+      - caddy-reverse-proxy_caddy_data:/data # I am serving the file using Caddy server
+    environment:
+      COOKIE: "wodz_session=<replace with your cookie value>"
+      OUTPUT_ICS: /data/www/html/wodz.ics # Write to Caddy server server
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.fetch-wodz.schedule: "@every 10m"
+      ofelia.job-exec.fetch-wodz.container: "wodztoics"
+      ofelia.job-exec.fetch-wodz.command: "python ./wodztoics/__init__.py"
+
+  ofelia: # Ofelia container as scheduler
+    container_name: ofelia
+    image: mcuadros/ofelia:latest
+    restart: unless-stopped
+    depends_on:
+      - wodztoics
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      
+volumes:
+  caddy-reverse-proxy_caddy_data: 
+    external: true
