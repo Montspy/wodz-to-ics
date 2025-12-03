@@ -1,15 +1,24 @@
 version: "3.7"
 
 services:
+  docker-static:
+    container_name: docker-static
+    image: lipanski/docker-static-website:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # File will be served at webcal://localhost:3000/wodz.ics
+    volumes:
+      - /path/to/folder:/home/static:ro
+
   wodztoics:
     container_name: wodztoics
     image: ghcr.io/montspy/wodz-to-ics:main
     command: "tail -f /dev/null" # Ofelia job-exec requires the container to be running
     volumes:
-      - caddy-reverse-proxy_caddy_data:/data # I am serving the file using Caddy server
+      - /path/to/folder:/data # Mount webserver shared directory
     environment:
       COOKIE: "wodz_session=<replace with your cookie value>"
-      OUTPUT_ICS: /data/www/html/wodz.ics # Write to Caddy server server
+      OUTPUT_ICS: /data/wodz.ics # Write to webserver directory
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.fetch-wodz.schedule: "@every 10m"
@@ -26,7 +35,3 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-      
-volumes:
-  caddy-reverse-proxy_caddy_data: 
-    external: true
