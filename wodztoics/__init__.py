@@ -70,6 +70,7 @@ def main():
     
     print(f"Writing calendar file to {config['OUTPUT_ICS']}")
 
+    os.makedirs(os.path.dirname(config['OUTPUT_ICS']), exist_ok=True)
     with open(config['OUTPUT_ICS'], "w+") as ics_file:
         ics_file.write(IcsCalendarStream.calendar_to_ics(calendar))
 
