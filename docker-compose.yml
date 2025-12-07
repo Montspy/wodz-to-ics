@@ -16,8 +16,9 @@ services:
     command: "tail -f /dev/null" # Ofelia job-exec requires the container to be running
     volumes:
       - /path/to/folder:/data # Mount webserver shared directory
+      - cookies:/cookies # Mount volume to store session cookies
     environment:
-      COOKIE: "wodz_session=<replace with your cookie value>"
+      SEED_COOKIE: "wodz_session=<replace with your cookie value>"
       OUTPUT_ICS: /data/wodz.ics # Write to webserver directory
     labels:
       ofelia.enabled: "true"
@@ -34,4 +35,7 @@ services:
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  cookies:
 

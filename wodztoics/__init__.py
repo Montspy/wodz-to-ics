@@ -13,7 +13,7 @@ from ical.exceptions import CalendarParseError
 def load_config() -> dict[str, ]:
     DEFAULTS = {
         "API_BOOKINGS_URL": "https://wodz.app/subscriber/booking/subscriberNextBookings",
-        "COOKIE": "",
+        "SEED_COOKIE": "",
         "OUTPUT_ICS": "./wodz.ics"
     }
 
@@ -24,9 +24,6 @@ def load_config() -> dict[str, ]:
     # Replace only existing keys with dotenvs
     dotenvs = dotenv_values(".env")
     config.update({key: dotenvs[key] for key in (dotenvs.keys() & config.keys())})
-
-    # Parse cookies if any
-    config["parsed_cookies"] = {cookie.strip().split("=")[0]: cookie.strip().split("=")[1] for cookie in config["COOKIE"].split(";") if (len(cookie.strip("=")) >= 2) }
 
     print("Parsed config to:")
     print(config)
@@ -61,9 +58,13 @@ def main():
     print(f"{len(list(calendar.timeline))} bookings left in calendar")
 
     # Get WODZ bookings
-    wodz = WODZ(config['API_BOOKINGS_URL'], config['parsed_cookies'])
+    wodz = WODZ(config['API_BOOKINGS_URL'], config['SEED_COOKIE'])
     print("Fetching bookings from wodz.app API")
     bookings = wodz.fetch_bookings()
+    if bookings is None:
+        print(f"Error: failed to get bookings from wodz.app API. Exiting...")
+        return
+    
     print(f"Got {len(bookings['bookings'])} bookings, creating events")
     
     def utc_to_local(utc_dt: datetime) -> datetime:
